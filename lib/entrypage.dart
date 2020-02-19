@@ -5,10 +5,10 @@ import 'dart:async';
 import 'package:otil/model.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:otil/options_model.dart';
-
 import 'package:scoped_model/scoped_model.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
+//for each tile of categories
 class EachTile extends StatefulWidget {
   final Widget child;
   final index;
