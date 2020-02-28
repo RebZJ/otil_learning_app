@@ -10,34 +10,45 @@ class Entry {
   String title;
   String body;
   DateTime timestamp = DateTime.now(); //time now
-  // List<String> imagesPathList = List();
+  List imagesPathList = List();
   // // List<String> audioAudioList = List();
   List<String> categoriesList;
 
-  Entry({this.title, this.timestamp, this.body, this.categoriesList});
+  Entry(
+      {this.title,
+      this.timestamp,
+      this.body,
+      this.categoriesList,
+      this.imagesPathList});
 
   factory Entry.fromJson(Map<String, dynamic> json) {
     var data1 = json['categoriesList'];
-    List<String> data;
+
+    var data2 = json['imagesPathList'];
+    List<String> dataImg;
+
+    if (data2 != null) {
+      dataImg = List<String>.from(data2);
+    }
+
+    List<String> dataCat;
     if (data1 != null) {
-      data = List<String>.from(data1);
+      dataCat = List<String>.from(data1);
     }
     // print(json);
     return Entry(
         title: json['title'],
         body: json['body'],
         timestamp: DateTime.parse(json['timestamp']),
-        categoriesList: data);
+        categoriesList: dataCat,
+        imagesPathList: dataImg);
   }
-  //    imagesPathList = jsonDecode(json['imagesPathList']).map((json) => Entry.fromJson(json)).toList(),
-
-  //     timestamp = DateTime.parse(json['timestamp'])
 
   Map<String, dynamic> toJson() => {
         'title': title,
         'body': body,
         'timestamp': timestamp.toIso8601String(),
-        //   'imagesPathList': imagesPathList,
+        'imagesPathList': imagesPathList,
         'categoriesList': categoriesList,
       };
 }
@@ -60,7 +71,7 @@ Future<File> get localFileEntries async {
 void writeEntries() async {
   final file = await localFileEntries;
   // Write the file.
-  await file.writeAsString(jsonEncode(entryList));
+  file.writeAsString(json.encode(entryList));
 }
 
 void readEntries() async {
@@ -69,11 +80,11 @@ void readEntries() async {
   // Read the file.
   String contents = await file.readAsString();
 
-  List data = await jsonDecode(contents);
+  List data =  json.decode(contents);
   entryList = data.map((json) => Entry.fromJson(json)).toList();
 }
 
-
+//Categories save file
 Future<File> get localFileCate async {
   final path = await localPath;
   return File('$path/categories.txt');
@@ -82,17 +93,17 @@ Future<File> get localFileCate async {
 void writeCate() async {
   final file = await localFileCate;
   // Write the file.
-  await file.writeAsString(jsonEncode(cateList));
+  await file.writeAsString(json.encode(cateList));
 }
 
 void readCate() async {
-
   final file = await localFileCate;
-
+  bool exists = await file.exists();
   // Read the file.
-  String contents = await file.readAsString();
+  if (exists == true) {
+    String contents = await file.readAsString();
 
-  List data = await jsonDecode(contents);
-  cateList = List<String>.from(data);
+    List data = json.decode(contents);
+    cateList = List<String>.from(data);
+  }
 }
-

@@ -29,6 +29,7 @@ dependencies:
   shared_preferences: ^0.5.6+1
   sliding_up_panel: ^1.0.0
   flutter_gradients: ^0.0.1
+  path: ^1.6.4
   flutter:
     sdk: flutter
 

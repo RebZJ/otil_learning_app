@@ -16,13 +16,20 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  
+  _initFirst() async {
+    var file = await localFileEntries;
+    bool exists = await file.exists();
+    if (exists == true) {
+      readEntries();
+      readCate();
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-
-    readEntries();
-    readCate();
-
+    _initFirst();
   }
 
   @override
@@ -36,7 +43,8 @@ class _MyAppState extends State<MyApp> {
             textTheme: TextTheme(bodyText1: TextStyle(color: Colors.white)),
             brightness:
                 model.darkMode == false ? Brightness.light : Brightness.dark,
-            primaryColor: model.darkMode == true?Colors.indigo[800]:Colors.blue[800],
+            primaryColor:
+                model.darkMode == true ? Colors.indigo[800] : Colors.blue[800],
             fontFamily: 'Roboto',
           ),
           routes: {

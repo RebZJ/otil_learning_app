@@ -53,13 +53,16 @@ class Screen extends StatefulWidget {
 }
 
 class _ScreenState extends State<Screen> {
-  // or as a local variable
-  AudioCache player = AudioCache();
-  bool isSwitched = false;
+  //bool isSwitched = false;
+  void playJingle(){
+    AudioCache player = AudioCache();
+    player.play('intro_jingle.wav');
+  }
+
   @override
   void initState() {
     super.initState();
-    player.play('intro_jingle.wav');
+    playJingle();
   }
 
   @override

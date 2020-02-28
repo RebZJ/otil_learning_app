@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:otil/model.dart';
+import 'package:path/path.dart';
 
 class CategoriesPage extends StatefulWidget {
   @override
@@ -75,6 +76,32 @@ class _CategoriesPageState extends State<CategoriesPage> {
     );
   }
 
+  _removeCategory(index, context, cateToRemove) {
+    bool toRemove = true;
+
+    for (var i in entryList) {
+      if (i.categoriesList.contains(cateToRemove)) {
+        toRemove = false;
+      }
+    }
+    if (toRemove == true) {
+      cateList.removeAt(index);
+      writeCate();
+      Navigator.of(context).pop();
+    } else {
+     
+      showDialog(
+          context: context,
+          builder: (BuildContext context) => AlertDialog(
+                title: Text(
+                    "Some entries contain this category, please remove them to remove this category"),
+              ));
+    }
+
+    setState(() {});
+    
+  }
+
   _editCate(index, context) {
     showDialog(
       context: context,
@@ -90,13 +117,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
 
             FlatButton(
               child: Text("Remove"),
-              onPressed: () {
-                cateList.removeAt(index);
-                writeCate();
-
-                setState(() {});
-                Navigator.of(context).pop();
-              },
+              onPressed: () => _removeCategory(index, context, cateList[index]),
             ),
             FlatButton(
               child: Text("Close"),

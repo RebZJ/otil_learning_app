@@ -22,24 +22,27 @@ class _OptionsPageState extends State<OptionsPage> {
                 borderRadius:
                     BorderRadius.vertical(bottom: Radius.circular(10))),
           ),
-          body: Center(
-            child: Column(
-              children: <Widget>[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text('Dark Mode', style: TextStyle(fontSize: 18)),
-                    Switch(
-                      value: model.darkMode,
-                      onChanged: (value) {
-                        model.isDarkMode(value);
+          body: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Center(
+              child: Column(
+                children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      Text('Dark Mode', style: TextStyle(fontSize: 18)),
+                      Switch(
+                        value: model.darkMode,
+                        onChanged: (value) {
+                          model.isDarkMode(value);
 
-                        return model.darkMode;
-                      },
-                    )
-                  ],
-                )
-              ],
+                          return model.darkMode;
+                        },
+                      )
+                    ],
+                  )
+                ],
+              ),
             ),
           ),
         ),
