@@ -100,7 +100,7 @@ class _EachTileState extends State<EachTile> {
 class Expan extends StatefulWidget {
   final index;
   final mode;
-  Expan({this.index = 0, this.mode});
+  Expan({this.index = 100000000, this.mode});
   @override
   _ExpanState createState() => _ExpanState();
 }
@@ -110,7 +110,7 @@ class _ExpanState extends State<Expan> {
   File _image;
 
   Future getImage(localImageList, context, source) async {
-    // OptionsModel model = ScopedModel.of(context);
+    OptionsModel model = ScopedModel.of(context);
     var maxPhotos = 3;
     if (localImageList.length < maxPhotos) {
       File image = await ImagePicker.pickImage(source: source);
@@ -119,6 +119,7 @@ class _ExpanState extends State<Expan> {
 
       if (image != null) {
         localImageList.add(image);
+        model.entryPagePanelController.open();
       } else {
         showDialog(
             context: context,
@@ -230,7 +231,7 @@ class _ExpanState extends State<Expan> {
         // both default to 16
         marginRight: 18,
         marginBottom: 20,
-        visible: (widget.mode=='view'?false:true),
+        visible: (widget.mode == 'view' ? false : true),
         animatedIconTheme: IconThemeData(size: 22.0),
         // this is ignored if animatedIcon is non null
         child: Icon(Icons.add),
@@ -251,7 +252,7 @@ class _ExpanState extends State<Expan> {
             child: Icon(Icons.add_a_photo),
             backgroundColor: Colors.blue,
             label: 'Take a photo',
-            labelStyle: TextStyle(fontSize: 12.0),
+            labelStyle: TextStyle(fontSize: 12.0, color: Colors.white),
             onTap: () =>
                 getImage(model.localListImages, context, ImageSource.camera),
           ),
@@ -260,7 +261,7 @@ class _ExpanState extends State<Expan> {
             child: Icon(Icons.photo),
             backgroundColor: Colors.green,
             label: 'Add a photo',
-            labelStyle: TextStyle(fontSize: 12.0),
+            labelStyle: TextStyle(fontSize: 12.0, color: Colors.white),
             onTap: () =>
                 getImage(model.localListImages, context, ImageSource.gallery),
           ),
@@ -269,7 +270,7 @@ class _ExpanState extends State<Expan> {
               child: Icon(Icons.category),
               backgroundColor: Colors.red,
               label: 'Categories (Add at least one)',
-              labelStyle: TextStyle(fontSize: 14.0, color: Colors.blue),
+              labelStyle: TextStyle(fontSize: 14.0, color: Colors.white),
               onTap: () => _addCates(context)),
         ],
       )),
@@ -315,65 +316,99 @@ class _EntryPageState extends State<EntryPage> {
   @override
   void initState() {
     super.initState();
+    // readEntries();
     intialiseContent();
-  }
-
-  intialiseContent() async {
-    OptionsModel model = ScopedModel.of(context);
-    if ((widget.mode == 'edit') || (widget.mode == 'view')) {
-      titleController.text = entryList[widget.index].title;
-      bodyController.text = entryList[widget.index].body;
-      if (entryList[widget.index].imagesPathList.isEmpty == false) {
-        var l = entryList[widget.index].categoriesList..toList();
-        model.localListCat = l;
-
-        List<File> l2 = [];
-        for (String i in entryList[widget.index].imagesPathList) {
-          l2.add(File(i));
-        }
-        model.localListImages = l2;
-      }
-    } else if (widget.mode == 'save') {
-      model.localListImages.clear();
-      model.localListCat.clear();
-    }
   }
 
   TextEditingController titleController = TextEditingController();
   TextEditingController bodyController = TextEditingController();
 
+  intialiseContent() {
+    OptionsModel model = ScopedModel.of(context);
+    model.localListCat.clear();
+    model.localListImages.clear();
+    if ((widget.mode == 'edit') || (widget.mode == 'view')) {
+      titleController.text = entryList[widget.index].title;
+      bodyController.text = entryList[widget.index].body;
+
+      var blep = entryList[widget.index].categoriesList;
+      model.localListCat = blep;
+      List<String> l1 = [];
+      if (entryList[widget.index].categoriesList.isNotEmpty == true) {
+        for (String i in entryList[widget.index].categoriesList) {
+          l1.add(i);
+        }
+      }
+      model.localListCat = l1;
+      List<File> l2 = [];
+      if (entryList[widget.index].imagesPathList.isNotEmpty == true) {
+        for (String i in entryList[widget.index].imagesPathList) {
+          l2.add(File(i));
+        }
+
+        model.localListImages = l2;
+        setState(() {});
+      } else {
+        model.localListImages.clear();
+      }
+    } else if (widget.mode == 'save') {
+      // print(widget.index);
+      // print(widget.mode);
+
+      model.localListCat.clear();
+      model.localListImages.clear();
+    }
+  }
+
   //all that is responsible for adding images in as a list
+  // Future<List<String>> fileToPatha(
+  //     List<File> imagesList, DateTime timestampNow) async {
+  //   String locPath = await localPath;
+  //   String _timestamp;
+
+  //   if (widget.mode == 'save') {
+  //     _timestamp = timestampNow.toIso8601String();
+  //     await Directory('$locPath/$_timestamp').create();
+  //   } else if (widget.mode == 'edit' || widget.mode == 'view') {
+  //     _timestamp = entryList[widget.index].timestamp.toIso8601String();
+  //   }
+
+  //   List<String> lista = [];
+  //   for (var i = 0; i < imagesList.length; i++) {
+  //     // lista.add(imagesList[i].path);
+  //     String basename = p.basename(imagesList[i].path);
+
+  //     await imagesList[i].copy('$locPath/$_timestamp/$basename');
+  //     lista.add('$locPath/$_timestamp/$basename');
+  //   }
+
+  //   return lista;
+  // }
+
   Future<List<String>> fileToPath(
       List<File> imagesList, DateTime timestampNow) async {
     String locPath = await localPath;
     String _timestamp;
+    List<String> lista = [];
 
     if (widget.mode == 'save') {
       _timestamp = timestampNow.toIso8601String();
-      await Directory('$locPath/$_timestamp').create();
-    } else if (widget.mode == 'edit') {
+    } else if (widget.mode == 'edit' || widget.mode == 'view') {
       _timestamp = entryList[widget.index].timestamp.toIso8601String();
     }
 
-    List<String> lista = [];
-    for (var i = 0; i < imagesList.length; i++) {
-      // lista.add(imagesList[i].path);
-      String basename = p.basename(imagesList[i].path);
-
-      imagesList[i].copy('$locPath/$_timestamp/$basename');
-      lista.add('$locPath/$_timestamp/$basename');
+    //images list is of model.imagelist
+    for (File i in imagesList) {
+      String basename = p.basename(i.path);
+      if (basename.contains('$_timestamp')) {
+        lista.add(i.path);
+        print(i.path);
+      } else {
+        var imagefile = i.copySync('$locPath/$_timestamp' + '$basename');
+        print(imagefile.path);
+        lista.add(imagefile.path);
+      }
     }
-
-    //potential clean up at some date
-    // for (var i = 0; i < entryList[i].imagesPathList.length; i++) {
-    //   bool contains = lista.contains(entryList[i].imagesPathList);
-    //   if (!contains) {
-    //     String list = entryList[i].imagesPathList.toString();
-    //     var dir = Directory(list);
-    //     if(dir!=null){dir.deleteSync();}
-
-    //   }
-    // }
 
     return lista;
   }
@@ -400,6 +435,7 @@ class _EntryPageState extends State<EntryPage> {
         writeEntries();
         readEntries();
         print(imgListString);
+
         Navigator.of(context).pop();
         Navigator.pushNamed(context, '/entrylist');
       } else if (widget.mode == 'edit') {
@@ -407,11 +443,11 @@ class _EntryPageState extends State<EntryPage> {
         entryList[widget.index].body = bodyController.text;
         entryList[widget.index].categoriesList = catList;
         entryList[widget.index].imagesPathList = imgListString;
-        writeEntries();
-        readEntries();
-        print(imgListString);
-        Navigator.of(context).pop();
-        setState(() {});
+        writeEntries().then((value) =>
+            readEntries().then((value) => Navigator.of(context).pop()));
+
+        // print(imgListString);
+
       }
     }
   }
@@ -444,6 +480,7 @@ class _EntryPageState extends State<EntryPage> {
         builder: (context, child, model) {
       return Container(
         child: Scaffold(
+          backgroundColor: Colors.blue[50],
           floatingActionButton: Expan(index: widget.index, mode: widget.mode),
           appBar: AppBar(
             shape: RoundedRectangleBorder(
@@ -452,50 +489,46 @@ class _EntryPageState extends State<EntryPage> {
             title: Text(widget.title),
             actions: <Widget>[
               FlatButton(
-                child: widget.mode=='view'?null:Text(
-                  "Save",
-                  style: TextStyle(color: Colors.white),
-                ),
+                child: widget.mode == 'view'
+                    ? null
+                    : Text(
+                        "Save",
+                        style: TextStyle(color: Colors.white),
+                      ),
                 onPressed: () => saveEntry(
                     context, model.localListCat, model.localListImages),
               )
             ],
           ),
           body: SlidingUpPanel(
-            minHeight: model.localListCat.isEmpty == true ? 26 : 65,
+            backdropOpacity: 0.5,
+            backdropColor: Colors.black,
+            backdropEnabled: true,
+            controller: model.entryPagePanelController,
+            minHeight: 65,
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(24.0),
               topRight: Radius.circular(24.0),
             ),
             panel: Container(
                 child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 Center(
                   child: Icon(Icons.drag_handle),
                 ),
-                Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      for (var item in model.localListCat)
-                        Card(
-                          child: Padding(
-                            padding: const EdgeInsets.all(4.0),
-                            child: Text(
-                              item + " ",
-                              style:
-                                  TextStyle(color: Colors.black, fontSize: 18),
-                            ),
-                          ),
-                        )
-                    ]),
-                Row(
-                  children: children(model, context),
+                Wrap(direction: Axis.horizontal, children: childrenCate(model)),
+                Wrap(
+                  direction: Axis.horizontal,
+                  runAlignment: WrapAlignment.start,
+                  crossAxisAlignment: WrapCrossAlignment.start,
+                  children: childrenImages(model, context),
                 )
               ],
             )),
             body: Padding(
-              padding: EdgeInsets.fromLTRB(
-                  10, 10, 10, (model.localListCat.isEmpty == true ? 120 : 150)),
+              padding: EdgeInsets.fromLTRB(10, 10, 10, 160),
               child: AnimatedPadding(
                 curve: Curves.decelerate,
                 duration: Duration(milliseconds: 300),
@@ -521,7 +554,7 @@ class _EntryPageState extends State<EntryPage> {
                       children: <Widget>[
                         TextField(
                           maxLength: 150,
-                          enabled: (widget.mode=='view'?false:true),
+                          enabled: (widget.mode == 'view' ? false : true),
                           maxLengthEnforced: true,
                           controller: titleController,
                           keyboardType: TextInputType.multiline,
@@ -534,7 +567,7 @@ class _EntryPageState extends State<EntryPage> {
                         TextField(
                           controller: bodyController,
                           autofocus: false,
-                          enabled:(widget.mode=='view'?false:true),
+                          enabled: (widget.mode == 'view' ? false : true),
                           keyboardType: TextInputType.multiline,
                           maxLines: null,
                           decoration: InputDecoration(
@@ -554,18 +587,87 @@ class _EntryPageState extends State<EntryPage> {
     });
   }
 
-  List<Widget> children(OptionsModel model, BuildContext context) {
+  List<Widget> childrenCate(OptionsModel model) {
     List<Widget> listToReturn = [];
+
+    if (model.localListImages.isEmpty == false) {
+      listToReturn.add(Padding(
+        padding: EdgeInsets.only(right: 6, top: 5, left: 10),
+        child: GestureDetector(
+          onTap: () => model.entryPagePanelController.open(),
+          child: Container(
+              decoration: BoxDecoration(
+                  color: Colors.red[100],
+                  borderRadius: BorderRadius.all(Radius.circular(5.0))),
+              padding: EdgeInsets.all(5),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Text(model.localListImages.length.toString() + " "),
+                  Icon(
+                    Icons.image,
+                    size: 20,
+                  )
+                ],
+              )),
+        ),
+      ));
+    }
+    for (var item in model.localListCat) {
+      listToReturn.add(Padding(
+        padding: const EdgeInsets.all(6.0),
+        child: Container(
+          padding: EdgeInsets.all(3),
+          decoration: BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.black38, offset: Offset(1, 1), blurRadius: 2)
+              ],
+              color: Colors.blue[100],
+              borderRadius: BorderRadius.all(Radius.circular(25.0))),
+          child: Text(
+            "  " + item + "  ",
+            style: TextStyle(color: Colors.black, fontSize: 18),
+          ),
+        ),
+      ));
+    }
+    return listToReturn;
+  }
+
+  List<Widget> childrenImages(OptionsModel model, BuildContext context) {
+    List<Widget> listToReturn = [];
+    Widget _loadImage(item) {
+      bool exists = item.existsSync();
+      //   print(item.toString() + '||||');
+      if (exists == true) {
+        return Image.file(item);
+      } else {
+        return Text(
+          "couldn't load images :(",
+          style: TextStyle(color: Colors.black),
+        );
+      }
+    }
+
     Widget currentWidget;
     if (model.localListImages.isEmpty == false) {
       for (var item in model.localListImages) {
         currentWidget = GestureDetector(
-            onTap: () => enlargeImage(context, item),
-            child: Container(
-              constraints: BoxConstraints(maxHeight: 60, maxWidth: 60),
-              child: Padding(
-                padding: const EdgeInsets.all(2.0),
-                child: Center(child: item != null ? Image.file(item) : null),
+            onTap: () =>
+                item.existsSync() == true ? enlargeImage(context, item) : null,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                decoration: BoxDecoration(
+                    color: Colors.black,
+                    borderRadius: BorderRadius.all(Radius.circular(5.0))),
+                padding: EdgeInsets.all(5),
+                constraints: BoxConstraints(maxHeight: 100, maxWidth: 100),
+                child: Padding(
+                  padding: const EdgeInsets.all(2.0),
+                  child: Center(child: _loadImage(item)),
+                ),
               ),
             ));
         listToReturn.add(currentWidget);

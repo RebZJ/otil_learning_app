@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:otil/model.dart';
-import 'package:path/path.dart';
+
 
 class CategoriesPage extends StatefulWidget {
   @override
@@ -30,6 +30,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
             maxLengthEnforced: true,
             controller: _controllerCate,
             decoration: InputDecoration(
+              
               hintText: "New category",
             ),
           ),
@@ -135,6 +136,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
   Widget build(BuildContext context) {
     return Container(
         child: Scaffold(
+          backgroundColor: Colors.blue[50],
       floatingActionButton: FloatingActionButton(
           child: Icon(Icons.add), onPressed: () => _addCate(context)),
       appBar: AppBar(

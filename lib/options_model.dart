@@ -1,6 +1,7 @@
 import 'package:scoped_model/scoped_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class OptionsModel extends Model {
   OptionsModel() {
@@ -8,16 +9,17 @@ class OptionsModel extends Model {
   }
 //init
   _init() {
-    if (_firstRun == true) {
-      _firstRun = false;
-      save();
+    if (firstRun == true) {
+      firstRun = false;
+      _save();
     } else {
-      load();
+      _load();
     }
   }
 
+  PanelController entryPagePanelController = new PanelController();
   //decalre variables and defaults
-   bool _firstRun = true;
+  bool _firstRun = true;
   List<String> _localListCat = List();
   List<File> _localListImages = List();
   bool _isSwitched = false;
@@ -29,6 +31,12 @@ class OptionsModel extends Model {
   get maxCategories => _maxCategories;
   get localListCat => _localListCat;
   get localListImages => _localListImages;
+
+  set firstRun(value) {
+    _firstRun = value;
+    _save();
+    notifyListeners();
+  }
 
   set localListImages(value) {
     _localListImages = value;
@@ -47,7 +55,7 @@ class OptionsModel extends Model {
 
   void isitSwitched(bool value) {
     _isSwitched = value;
-    save();
+    _save();
     notifyListeners();
   }
 
@@ -58,11 +66,11 @@ class OptionsModel extends Model {
 
   void isDarkMode(bool value) {
     _darkMode = value;
-    save();
+    _save();
     notifyListeners();
   }
 
-  save() async {
+  _save() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     prefs.setBool('isSwitched_save', _isSwitched);
@@ -72,7 +80,7 @@ class OptionsModel extends Model {
     prefs.setBool('firstRun_save', _firstRun);
   }
 
-  load() async {
+  _load() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     _isSwitched = prefs.getBool('isSwitched_save');
 

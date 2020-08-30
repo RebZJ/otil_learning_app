@@ -52,10 +52,16 @@ class Entry {
         'categoriesList': categoriesList,
       };
 }
-
+//data for categories list
 List<String> cateList = [];
+//data for entry
+List<Entry> _entryList = [];
 
-List<Entry> entryList = [];
+get entryList => _entryList;
+
+set entryList(value){
+  _entryList = value;
+}
 
 Future<String> get localPath async {
   final directory = await getApplicationDocumentsDirectory();
@@ -68,20 +74,22 @@ Future<File> get localFileEntries async {
   return File('$path/entries.txt');
 }
 
-void writeEntries() async {
+Future<File> writeEntries() async {
   final file = await localFileEntries;
   // Write the file.
-  file.writeAsString(json.encode(entryList));
+  return file.writeAsString(json.encode(entryList));
 }
 
-void readEntries() async {
+Future<List> readEntries() async {
   final file = await localFileEntries;
 
   // Read the file.
   String contents = await file.readAsString();
 
-  List data =  json.decode(contents);
+  List data = json.decode(contents);
   entryList = data.map((json) => Entry.fromJson(json)).toList();
+
+  return entryList;
 }
 
 //Categories save file
@@ -90,10 +98,10 @@ Future<File> get localFileCate async {
   return File('$path/categories.txt');
 }
 
-void writeCate() async {
+Future<File> writeCate() async {
   final file = await localFileCate;
   // Write the file.
-  await file.writeAsString(json.encode(cateList));
+  return file.writeAsString(json.encode(cateList));
 }
 
 void readCate() async {

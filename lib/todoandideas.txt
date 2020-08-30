@@ -1,0 +1,8 @@
+To do: 
+
+Add permissions for image picker for iOS
+
+
+Everyday you need to put down one entry for you to be able to pass the challenge
+
+You can switch to challenge mode to check the ones that count towards the challenge, otherwise you can just use it to track whatever it is that you're wanting to track. 

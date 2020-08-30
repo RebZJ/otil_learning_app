@@ -1,6 +1,17 @@
 # otil
 
+This is a learning tracker project designed in Flutter using material design. 
+
+Example screen shots:
+
+https://imgur.com/RTd1ysc
+
+https://imgur.com/OXFVBIA
+
+
 A new Flutter project.
+
+Please feel free to build this yourself! You'll need to use Flutter.
 
 ## Getting Started
 
