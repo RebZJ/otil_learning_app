@@ -3,10 +3,12 @@
 This is a learning tracker project designed in Flutter using material design. 
 
 Example screen shots:
+
+<div>
 <img src="https://imgur.com/RTd1ysc.jpg"/>
 
-https://imgur.com/OXFVBIA
-
+<img src="https://imgur.com/OXFVBIA.jpg"/>
+<div/>
 
 Please feel free to build this yourself! You'll need to use Flutter. To build the iOS app, you'll need to use Xcode.
 
